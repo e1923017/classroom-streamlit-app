@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 
-st.title("教室人数表示Webアプリ")
+st.title("空き情報表示Webアプリ")
 
 CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRmjJQCY8tTaIYkXaK90sgZCnaZE-vvsfGEfg4_o1VFl1dpnSp3yl5g1z2-PCfqzk6vNm6tzYen3fC4/pub?output=csv"
 
