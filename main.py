@@ -20,7 +20,7 @@ latest = counts.iloc[-1]
 
 st.write("現在の人数")
 
-st.write({counts})
+st.write(latest)
 
 
 
