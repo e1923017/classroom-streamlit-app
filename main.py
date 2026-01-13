@@ -14,16 +14,19 @@ st.title("空き状況確認アプリ")
 # スプレッドシート参照
 df = pd.read_csv(CSV_URL)
 
+# 人数列取得空白除外
 counts = df["人数"].dropna()
 
 latest = counts.iloc[-1]
 
 st.metric("現在の人数",latest)
 
+time = df["時間"].dropna()
+
 
 
 st.subheader("過去の人数推移")
-st.line_chart(df.set_index("time")["people"])
+st.line_chart(df.set_index("time")["counts"])
 
 st.subheader("ログ")
 st.dataframe(df)
