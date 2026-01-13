@@ -18,7 +18,9 @@ counts = df.df["人数"].dropna()
 
 latest = counts.iloc[-1]
 
-st.metric("現在の人数", {latest})
+st.metric("現在の人数")
+
+st.write({counts})
 
 
 
