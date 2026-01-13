@@ -27,7 +27,7 @@ df = pd.read_csv(CSV_URL)
 # 人数取得（スプレッドシート参照）
 count = df[df["教室"] == room]["人数"].values[0]
 
-st.metric("現在の人数", {count}.iloc[-1])
+st.metric("現在の人数", {count}.)
 
 
 
