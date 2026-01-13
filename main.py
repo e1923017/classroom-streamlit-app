@@ -26,7 +26,7 @@ time = df["時間"].dropna()
 
 
 st.subheader("過去の人数推移")
-st.line_chart(df.set_index("time")["counts"])
+st.line_chart(df.set_index("時間")["人数"])
 
 st.subheader("ログ")
 st.dataframe(df)
