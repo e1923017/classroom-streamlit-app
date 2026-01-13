@@ -15,7 +15,7 @@ st.title("空き状況確認アプリ")
 df = pd.read_csv(CSV_URL)
 
 # 人数取得（スプレッドシート参照）
-count = df[df["教室"] == room]["人数"].values[0]
+count = df["人数"].values[0]
 
 st.metric("現在の人数", {count})
 
