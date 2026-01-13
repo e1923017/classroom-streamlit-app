@@ -14,7 +14,7 @@ st.title("空き状況確認アプリ")
 # スプレッドシート参照
 df = pd.read_csv(CSV_URL)
 
-counts = df.df["人数"].dropna()
+counts = df["人数"].dropna()
 
 latest = counts.iloc[-1]
 
