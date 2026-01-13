@@ -1,3 +1,4 @@
+
 import streamlit as st
 import pandas as pd
 import datetime
@@ -10,17 +11,25 @@ st.set_page_config(page_title="空き状況確認", layout="wide")
 
 st.title("空き状況確認アプリ")
 
-def load_data():
-    now = datetime.datetime.now()
-    data = {
-        "time": [now - datetime.timedelta(minutes=5*i) for i in range(10)][::-1],
-        "people": [random.randint(0, 30) for _ in range(10)]
-    }
-    return pd.DataFrame(data)
+#def load_data():
+#    now = datetime.datetime.now()
+#    data = {
+#        "time": [now - datetime.timedelta(minutes=5*i) for i in range(10)][::-1],
+#        "people": [random.randint(0, 30) for _ in range(10)]
+#    }
+#    return pd.DataFrame(data)
 
-df = load_data()
+#df = load_data()
 
-st.metric("現在の人数", df["people"].iloc[-1])
+# スプレッドシート参照
+df = pd.read_csv(CSV_URL)
+
+# 人数取得（スプレッドシート参照）
+count = df[df["教室"] == room]["人数"].values[0]
+
+st.metric("現在の人数", {count}.iloc[-1])
+
+
 
 st.subheader("過去の人数推移")
 st.line_chart(df.set_index("time")["people"])
