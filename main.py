@@ -7,34 +7,51 @@ CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRmjJQCY8tTaIYkXaK90s
 st.set_page_config(page_title="空き状況確認", layout="wide")
 st.title("空き状況確認アプリ")
 
-# 履歴保存用（Streamlit側）
+# =====================
+# 履歴（最大10件）
+# =====================
 if "history" not in st.session_state:
     st.session_state.history = pd.DataFrame(columns=["時間", "人数"])
 
+# =====================
 # 最新データ取得
+# =====================
 df = pd.read_csv(CSV_URL)
 
-latest_people = df.loc[0, "人数"]
-latest_time = pd.to_datetime(df.loc[0, "時間"])
+latest_people = pd.to_numeric(df.loc[0, "人数"], errors="coerce")
 
-# 履歴に追加（同じ時刻は重複防止）
+latest_time = pd.to_datetime(
+    df.loc[0, "時間"],
+    errors="coerce"
+)
+
+# 時刻が取れない場合は現在時刻
+if pd.isna(latest_time):
+    latest_time = pd.Timestamp.now()
+
+# =====================
+# 履歴に追加（重複防止）
+# =====================
+history = st.session_state.history
+
 if (
-    len(st.session_state.history) == 0
-    or st.session_state.history.iloc[-1]["時間"] != latest_time
+    len(history) == 0
+    or history.iloc[-1]["時間"] != latest_time
 ):
-    st.session_state.history.loc[len(st.session_state.history)] = [
-        latest_time,
-        latest_people,
-    ]
+    history.loc[len(history)] = [latest_time, latest_people]
 
-# ===== 表示 =====
+# 直近10件に制限
+st.session_state.history = history.tail(10).reset_index(drop=True)
 
+# =====================
+# 表示
+# =====================
 st.metric("現在の人数", latest_people)
 
-st.subheader("過去の人数推移")
+st.subheader("過去の人数推移（直近10件）")
 st.line_chart(
     st.session_state.history.set_index("時間")["人数"]
 )
 
-st.subheader("ログ")
+st.subheader("ログ（直近10件）")
 st.dataframe(st.session_state.history)
