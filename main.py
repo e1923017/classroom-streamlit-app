@@ -31,7 +31,7 @@ st.session_state.history = history.tail(10).reset_index(drop=True)
 # ===== 表示 =====
 st.metric("現在の人数", latest_people)
 
-st.caption(f"（シート更新時刻: {sheet_time}）")
+st.caption(f"（更新時刻: {sheet_time}）")
 
 st.subheader("人数の推移")
 st.line_chart(st.session_state.history.set_index("時間")["人数"])
