@@ -1,86 +1,38 @@
 
 import streamlit as st
-import gspread
 import pandas as pd
-from google.oauth2.service_account import Credentials
-from datetime import datetime
 
-# =====================
-# Google Sheets 接続
-# =====================
-SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
+CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRmjJQCY8tTaIYkXaK90sgZCnaZE-vvsfGEfg4_o1VFl1dpnSp3yl5g1z2-PCfqzk6vNm6tzYen3fC4/pub?output=csv"
 
-creds = Credentials.from_service_account_info(
-    st.secrets["gcp_service_account"],
-    scopes=SCOPES
-)
-
-client = gspread.authorize(creds)
-sheet = client.open("PeopleLog").sheet1
-
-# =====================
-# Streamlit 設定
-# =====================
 st.set_page_config(page_title="空き状況確認", layout="wide")
 st.title("空き状況確認アプリ")
 
-# =====================
-# Sheets から取得
-# =====================
-latest_people = sheet.acell("B2").value
-latest_time = sheet.acell("C2").value
+if "history" not in st.session_state:
+    st.session_state.history = pd.DataFrame(columns=["時間", "人数"])
 
-logs = sheet.get("B4:C13")  # 過去10件
+df = pd.read_csv(CSV_URL)
 
-# DataFrame化
-log_df = pd.DataFrame(logs, columns=["人数", "時間"])
+latest_people = pd.to_numeric(df.iloc[0, 1], errors="coerce")
 
-# =====================
+# 毎回1件追加（Streamlit実行＝ログ1件）
+st.session_state.history.loc[
+    len(st.session_state.history)
+] = [pd.Timestamp.now(), latest_people]
+
+# 直近10件のみ保持
+st.session_state.history = (
+    st.session_state.history
+    .tail(10)
+    .reset_index(drop=True)
+)
+
 # 表示
-# =====================
-st.subheader("最新情報")
 st.metric("現在の人数", latest_people)
-st.write(f"更新時刻：{latest_time}")
 
-st.subheader("過去10件ログ")
-st.dataframe(log_df)
-
-st.subheader("人数推移")
+st.subheader("人数の推移")
 st.line_chart(
-    log_df.set_index("時間")["人数"].astype(float)
+    st.session_state.history.set_index("時間")["人数"]
 )
 
-# =====================
-# 更新処理
-# =====================
-def update_sheets(new_people):
-    now = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
-
-    # 最新値を上書き
-    sheet.update("B2", new_people)
-    sheet.update("C2", now)
-
-    # 既存ログ（9件）取得
-    old_logs = sheet.get("B4:C12")
-
-    # 新ログを先頭に追加
-    new_logs = [[new_people, now]] + old_logs
-
-    # 10件分書き戻し
-    sheet.update("B4:C13", new_logs)
-
-# =====================
-# 更新UI
-# =====================
-st.subheader("人数更新")
-
-new_people = st.number_input(
-    "現在の人数を入力",
-    min_value=0,
-    step=1
-)
-
-if st.button("更新"):
-    update_sheets(new_people)
-    st.success("Google Sheets を更新しました")
-    st.experimental_rerun()
+st.subheader("ログ")
+st.dataframe(st.session_state.history)
