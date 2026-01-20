@@ -12,23 +12,26 @@ if "history" not in st.session_state:
 
 df = pd.read_csv(CSV_URL)
 
-# B列 → 人数
 latest_people = pd.to_numeric(df.iloc[0, 1], errors="coerce")
 
-# C列 → 時間
-latest_time = pd.to_datetime(df.iloc[0, 2], errors="coerce")
+# Sheetsの時間（参考）
+sheet_time = pd.to_datetime(df.iloc[0, 2], errors="coerce")
 
-if pd.isna(latest_time):
-    latest_time = pd.Timestamp.now()
+# Streamlit取得時刻をログ時刻にする
+log_time = pd.Timestamp.now()
 
 history = st.session_state.history
 
-if len(history) == 0 or history.iloc[-1]["時間"] != latest_time:
-    history.loc[len(history)] = [latest_time, latest_people]
+# 人数が変わったらログ追加
+if len(history) == 0 or history.iloc[-1]["人数"] != latest_people:
+    history.loc[len(history)] = [log_time, latest_people]
 
 st.session_state.history = history.tail(10).reset_index(drop=True)
 
+# ===== 表示 =====
 st.metric("現在の人数", latest_people)
+
+st.caption(f"（シート更新時刻: {sheet_time}）")
 
 st.subheader("人数の推移")
 st.line_chart(st.session_state.history.set_index("時間")["人数"])
