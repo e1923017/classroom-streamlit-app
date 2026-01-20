@@ -48,10 +48,10 @@ st.session_state.history = history.tail(10).reset_index(drop=True)
 # =====================
 st.metric("現在の人数", latest_people)
 
-st.subheader("過去の人数推移（直近10件）")
+st.subheader("人数の推移")
 st.line_chart(
     st.session_state.history.set_index("時間")["人数"]
 )
 
-st.subheader("ログ（直近10件）")
+st.subheader("ログ")
 st.dataframe(st.session_state.history)
