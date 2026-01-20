@@ -7,6 +7,8 @@ CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRmjJQCY8tTaIYkXaK90s
 st.set_page_config(page_title="空き状況確認", layout="wide")
 st.title("空き状況確認アプリ")
 
+st.write("実行時刻:", pd.Timestamp.now())
+
 if "history" not in st.session_state:
     st.session_state.history = pd.DataFrame(columns=["時間", "人数"])
 
